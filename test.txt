@@ -1,0 +1,4 @@
+12345678to stdout
+pid=2913,glob=7,var=1217644193
+a write to stdout
+pid=2912,glob=6,var=1217644192
