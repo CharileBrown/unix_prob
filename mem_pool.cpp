@@ -29,7 +29,7 @@ struct MemoryBlock
 	char aData[1];
 	static void *operator new( size_t sz,ushort len,ushort num )
 	{
-		return ::operator new(sizeof(MemoryBlock) + len * num);
+		return ::operator new(sizeof(MemoryBlock) + len * num + 3);
 	}
 	static void operator delete(void *p,size_t)
 	{
@@ -46,7 +46,8 @@ void *MemoryPool::Alloc()
 {
 	if( !pBlock )
 	{
-		pBlock = new(initsize,unitsize)MemoryBlock;
+		pBlock = new(initsize,unitsize)MemoryBlock();
+        memset(pBlock,0,sizeof(pBlock)+initsize*unitsize+3);
 		pBlock->size = initsize;
 		pBlock->nfree = initsize;
 		pBlock->first = 0;
@@ -54,6 +55,27 @@ void *MemoryPool::Alloc()
 	}
 	MemoryBlock *pMyBlock = pBlock;
 	while(pMyblock && !pMyBlock->nfree)
-
+        pMyBlock = pMyBlock -> pNext;
+    if( pMyBlock )
+    {
+        char *pfree = pMyBlock->aData + pMyBlock->first*unitsize;
+        pMyBlock->fist = *((ushort*)pfree)?*((ushort*)pfree):pMyBlock->first + 1;
+        pMyblock->nfree--;
+        return pfree;
+    }
+    else
+    {
+        pMyBlock = new(growsize,unitsize)MemoryPool();
+        if(pMyBlock == NULL)
+        {
+            fprintf(stderr,"Fail to get memory.\n");
+            return NULL;
+        }
+        memset(pMyBlock,0,sizeof(pMyBlock)+growsize*unitsize+3);
+        pMyBlock->size = growsize;
+        pMyBlock->nfree = growsize;
+        pMyBlock->aData
+    }
+    
 }
 
