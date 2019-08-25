@@ -15,11 +15,11 @@ class MemoryPool
 		ushort unitsize;
 		ushort growsize;
 	public:
-		MemoryPool(ushort unitsize,ushort initsize=1024, ushort growsize=256);
+		MemoryPool(ushort _unitsize,ushort _initsize=1024, ushort _growsize=256);
 		~MemoryPool();
 	void* Alloc();
-	void  Free( void *p );	
-}mem_pool;
+	void  Free( void *p ,int flag);	
+};
 struct MemoryBlock
 {
 	ushort size;
@@ -35,8 +35,8 @@ struct MemoryBlock
 	{
 		::operator delete(p);
 	}
-}
-MemoryPool::MemoryPool(ushort _unitsize,ushort _initsize=1024,ushort _growsize=256)
+};
+MemoryPool::MemoryPool(ushort _unitsize,ushort _initsize,ushort _growsize)
 {
 	unitsize = _unitsize + MINSIZE - ( _unitsize%MINSIZE );
 	initsize = _initsize;
@@ -47,25 +47,25 @@ void *MemoryPool::Alloc()
 	if( !pBlock )
 	{
 		pBlock = new(initsize,unitsize)MemoryBlock();
-        memset(pBlock,0,sizeof(pBlock)+initsize*unitsize+3);
+        	memset(pBlock,0,sizeof(pBlock)+initsize*unitsize+3);
 		pBlock->size = initsize;
 		pBlock->nfree = initsize;
 		pBlock->first = 0;
 		pBlock->pNext = NULL;
 	}
 	MemoryBlock *pMyBlock = pBlock;
-	while(pMyblock && !pMyBlock->nfree)
+	while(pMyBlock && !pMyBlock->nfree)
         pMyBlock = pMyBlock -> pNext;
     if( pMyBlock )
     {
         char *pfree = pMyBlock->aData + pMyBlock->first*unitsize;
-        pMyBlock->fist = *((ushort*)pfree)?*((ushort*)pfree):pMyBlock->first + 1;
-        pMyblock->nfree--;
-        return pfree;
+        pMyBlock->first = *((ushort*)pfree)?*((ushort*)pfree):pMyBlock->first + 1;
+        pMyBlock->nfree--;
+        return (void *)pfree;
     }
     else
     {
-        pMyBlock = new(growsize,unitsize)MemoryPool();
+        pMyBlock = new(growsize,unitsize)MemoryBlock();
         if(pMyBlock == NULL)
         {
             fprintf(stderr,"Fail to get memory.\n");
@@ -73,9 +73,36 @@ void *MemoryPool::Alloc()
         }
         memset(pMyBlock,0,sizeof(pMyBlock)+growsize*unitsize+3);
         pMyBlock->size = growsize;
-        pMyBlock->nfree = growsize;
-        pMyBlock->aData
+        pMyBlock->nfree = growsize-1;
+        pMyBlock->first = 1;
+	pMyBlock->pNext = pBlock;
+	pBlock = pMyBlock;
+	return (void *)(pMyBlock->aData);
     }
     
+}
+void MemoryPool::Free( void *p ,int flag)
+{
+	MemoryBlock *pMyBlock = pBlock;
+	MemoryBlock *pPre;
+	while( (p<pMyBlock->aData||(p>pMyBlock->aData)+(pMyBlock->size)*unitsize)&&pMyBlock )
+	{
+		pPre = pMyBlock;	
+		pMyBlock = pMyBlock->pNext;
+	}
+	if( pMyBlock==NULL ){
+		fprintf(stderr,"Fail to recover memory\n");
+		return;
+	}
+	ushort tmp = pMyBlock->first;
+	pMyBlock->first = (ushort)((long long)p-(long long)(pMyBlock->aData))/unitsize;
+	*((ushort *)p) = tmp;
+	pMyBlock->nfree++;	
+	if( flag&&pMyBlock->size==pMyBlock->nfree )
+	{
+		pPre->pNext = pMyBlock->pNext;
+		delete(pMyBlock);
+		return;
+	}
 }
 
