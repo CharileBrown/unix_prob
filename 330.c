@@ -15,7 +15,8 @@ struct queue{
 	pthread_rwlock_t q_lock;
 };
 
-int queue_init(struct queue *qp){
+int queue_init(struct queue *qp)
+{
 	int err;
 	qp->j_head = NULL;
 	qp->j_tail = NULL;
@@ -35,5 +36,16 @@ void job_insert(struct queue *qp,struct queue *jp)
 		qp->tail = jp;
 	qp->head = jp;
 	pthread_rwlock_unlock(&qp->q_lock);
+}
+struct job* job_find(struct queue *qp, pthread_t id)
+{
+	struct job* jp;
+	if( pthread_rwlock_rdlock(&qp->qlock) != 0 )
+		return NULL;
+	for( jp=qp->q_head;jp!=NULL;jp=jp->j_next )
+		if(pthread_equal(jp->j_id,id))
+			break;
+	pthread_rwlock_unlock(&qp->q_lock);
+	return jp;
 }
 
