@@ -7,7 +7,9 @@
 #include<stdlib.h>
 #include<errno.h>
 #include<sys/stat.h>
-
+#include<sys/msg.h>
+#include<sys/sem.h>
+#include<sys/shm.h>
 int lock_reg(int fd,int cmd,int type,off_t offset, int whence,off_t len)
 {
 	struct flock lock;
