@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -26,5 +27,17 @@ int main()
     sigsuspend(&oldset);
 
     return 0;
+=======
+#include "unix.h"
+
+typedef struct tt{
+	int a;
+}tt;
+
+int main()
+{
+	tt test;
+	test.a = 10;
+>>>>>>> the first commit
 }
 

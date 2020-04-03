@@ -1,0 +1,10 @@
+#include <unistd.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <time.h>
+#include <stdio.h>
+#include <sys/msg.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
