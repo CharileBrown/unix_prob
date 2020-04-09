@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include "common.h"
 
 struct msg_form
@@ -88,10 +87,20 @@ int main()
 	struct msg_form msg;
 
 	if( (key = ftok("./test.txt",256)) <0 )
+=======
+#include "unix.h"
+
+
+int main()
+{
+	int key_t key;
+	if( (key = ftok(".",'z')) < 0 )
+>>>>>>> 08f859ad510fdcc522baaa32eece87567a7c5057
 	{
 		perror("ftok error");
 		exit(1);
 	}
+<<<<<<< HEAD
 	if((shmid = shmget(key,1024,IPC_CREAT|0666)) == -1 )
 	{
 		perror("Create Shared Memory Error");
@@ -127,4 +136,5 @@ int main()
 	msgctl(msqid,IPC_RMID,&buf2);
 	del_sem(semid);
 	return 0;
+	
 }
