@@ -3,11 +3,17 @@
 #endif
 
 
-void *deal_with_connect(void *client_pool);
+
+int deal_with_request(char *buf)
+{
+	string str = buf;
+	regex query_regex("^(select) .*? from .*");
+	smatch match_res;
+	
+}
 
 void *deal_with_connect(void *client_pool )
 {
-	
 	clientpool_t * clientpool = (clientpool_t*) client_pool;
 	int client_fd;
 	struct sockaddr_in client_addr;
@@ -24,7 +30,7 @@ void *deal_with_connect(void *client_pool )
 		clientpool->queue_front = ( clientpool->queue_front + 1 )%clientpool->max_num;
 	pthread_mutex_unlock(&(clientpool->lock));
 	char buf[2048];
-	printf("读取消息:");
+	printf("读取消息:\n");
 	buf[0] = '\0';
 	int dataNum = read(client_fd,buf,2048);
 	if(dataNum < 0)
@@ -33,11 +39,11 @@ void *deal_with_connect(void *client_pool )
 		close(client_fd);
 		return NULL;
 	}
+	printf("=================the command is:%s===================\n",buf);
 	if( strcmp(buf,"quit") == 0 )
 	{
-			printf("The connect from %s%d is close\n",inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
+			printf("The connect from %s:%d is close\n",inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
 			close(client_fd);
 			return NULL;
 	}
-	
 }

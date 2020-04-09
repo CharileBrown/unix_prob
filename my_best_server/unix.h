@@ -16,17 +16,18 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <regex>
 using namespace std;
 
 #define UNIX_H
 
 typedef struct clientpool_t
 {
-●●●●pthread_mutex_t lock; //用于锁住整个结构体
-●●●●int *fd_queue;
-●●●●struct sockaddr_in *addr_queue;
-●●●●int max_num;
-●●●●int queue_size;
-●●●●int queue_front;
-●●●●int queue_rear;
+		pthread_mutex_t lock; //用于锁住整个结构体
+		int *fd_queue;
+		struct sockaddr_in *addr_queue;
+		int max_num;
+		int queue_size;
+		int queue_front;
+		int queue_rear;
 }clientpool_t;
