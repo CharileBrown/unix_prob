@@ -8,3 +8,8 @@
 #include <sys/msg.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <pthread.h>
+#include <string.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
